@@ -7,6 +7,8 @@ void replaceExtensionByIdx(const char * fileName, char * indexName){
 
 bool createTable(const char * tableName){
     FILE *f = NULL;
+    int u = NO_DELETED_REGISTERS; /*vale -1*/
+    char *indexName = NULL;
 
     /* Miramos si el .dat ya existe */
     f = fopen(tableName, "rb");
@@ -19,9 +21,16 @@ bool createTable(const char * tableName){
         if(f == NULL){
             return false;
         }
-        fwrite();
+        fwrite(&u, sizeof(int), 1, f);
         fclose(f);
     }
+
+    indexName = (char *) malloc(strleb(tableName) +1);
+    if(indexName == NULL){
+        return false;
+    }
+
+
 
 
     
@@ -29,6 +38,8 @@ bool createTable(const char * tableName){
 
 bool createIndex(const char * indexName){
     FILE *f = NULL;
+
+    int u = NO_DELETED_REGISTERS;
 
     /* Comprobamos si ya existe intentando abrirlo para lectura binaria */
     f = fopen(indexName, "rb");
@@ -43,15 +54,26 @@ bool createIndex(const char * indexName){
         return false;
     }
 
-    fwrite();
-    fwrite();
+    /* Escribimos la cabecera: root = -1 y deleted = -1 */
+    fwrite(&u, sizeof(int), 1, f);
+    fwrite(&u, sizeof(int), 1, f);
 
     fclose(f);
     return true;
 }
 
 bool findKey(const char * book_id, const char * indexName, int * nodeIDOrDataOffset){
+    FILE *f = NULL;
+    f= fopen(indexName, "rb");
+    if(f == NULL){
+        return false;
+    }
 
+
+
+
+    fclose(f);
+    return false;
 }
 
 bool addTableEntry(Book * book, const char * tableName, const char * indexName){
