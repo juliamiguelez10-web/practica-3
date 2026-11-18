@@ -8,30 +8,43 @@ void replaceExtensionByIdx(const char * fileName, char * indexName){
 bool createTable(const char * tableName){
     FILE *f = NULL;
 
-    f = fopen(tableName, "");
-    if(f == NULL){
-        return false;
+    /* Miramos si el .dat ya existe */
+    f = fopen(tableName, "rb");
+    if(f != NULL){
+        fclose(f);
+    }
+    else{
+        /* Si no existe, lo creamos nuevo en binario */
+        f= fopen(tableName, "wb+");
+        if(f == NULL){
+            return false;
+        }
+        fwrite();
+        fclose(f);
     }
 
 
+    
 }
 
 bool createIndex(const char * indexName){
     FILE *f = NULL;
 
-    f = fopen(indexName, "");
+    /* Comprobamos si ya existe intentando abrirlo para lectura binaria */
+    f = fopen(indexName, "rb");
     if(f != NULL){
         fclose(f);
         return true;
     }
 
-
-    f = fopen(indexName, "");
-    if(f==NULL){
+    /* Si no existe, lo creamos nuevo en binario */
+    f = fopen(indexName, "wb+");
+    if(f == NULL){
         return false;
     }
 
-
+    fwrite();
+    fwrite();
 
     fclose(f);
     return true;
@@ -51,8 +64,9 @@ bool addIndexEntry(char * book_id, int bookOffset, const char * indexName){
 
 void printTree(size_t level, const char * indexName){
     FILE *f = NULL;
+    int root = -1;
 
-    f = fopen(indexName);
+    f = fopen(indexName, "rb");
 
     if(f == NULL){
         return;
