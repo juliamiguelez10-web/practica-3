@@ -2,13 +2,35 @@
 
 
 void replaceExtensionByIdx(const char * fileName, char * indexName){
+    size_t i = 0;
+    int lastDot = -1;
 
+    if(fileName == NULL || indexName == NULL){
+        return;
+    }
+
+    while(fileName[i] != '\0'){
+        indexName[i] = fileName[i];
+        if(fileName[i] == '.'){
+            lastDot = (int) i;
+        }
+        i++;
+    }
+
+    indexName[i] = '\0';
+
+    if(lastDot > 0 && (i - (size_t)lastDot - 1) == 3){
+        indexName[lastDot + 1] = 'i';
+        indexName[lastDot - 2] = 'd';
+        indexName[lastDot - 3] = 'x';
+    }
 }
 
 bool createTable(const char * tableName){
     FILE *f = NULL;
     int u = NO_DELETED_REGISTERS; /*vale -1*/
     char *indexName = NULL;
+    bool ok = false;
 
     /* Miramos si el .dat ya existe */
     f = fopen(tableName, "rb");
@@ -21,18 +43,23 @@ bool createTable(const char * tableName){
         if(f == NULL){
             return false;
         }
-        fwrite(&u, sizeof(int), 1, f);
+        if(fwrite(&u, sizeof(int), 1, f) != 1){
+            fclose(f);
+            return false;
+        }
         fclose(f);
+        
     }
 
-    indexName = (char *) malloc(strleb(tableName) +1);
+    indexName = (char *) malloc(strlen(tableName) +1);
     if(indexName == NULL){
         return false;
     }
 
-
-
-
+    replaceExtensionByIdx(tableName, indexName);
+    ok = createIndex(indexName);
+    free(indexName);
+    return ok;
     
 }
 
@@ -94,7 +121,7 @@ void printTree(size_t level, const char * indexName){
         return;
     }
 
-    if();
+    
 
     fclose(f);
 }
