@@ -65,8 +65,11 @@ bool createTable(const char * tableName){
 
 bool createIndex(const char * indexName){
     FILE *f = NULL;
-
     int u = NO_DELETED_REGISTERS;
+
+    if(indexName == NULL){
+        return false;
+    }
 
     /* Comprobamos si ya existe intentando abrirlo para lectura binaria */
     f = fopen(indexName, "rb");
@@ -82,15 +85,8 @@ bool createIndex(const char * indexName){
     }
 
     /* Escribimos la cabecera: root = -1 y deleted = -1 */
-    if(fwrite(&u, sizeof(int), 1, f)!= 1){
-        fclose(f);
-        return false;
-    }
-
-    if(fwrite(&u, sizeof(int), 1, f) !=1){
-        fclose(f);
-        return false;
-    }
+    fwrite(&u, sizeof(int), 1, f);
+    fwrite(&u, sizeof(int), 1, f);
 
     fclose(f);
     return true;
