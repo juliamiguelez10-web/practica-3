@@ -85,8 +85,15 @@ bool createIndex(const char * indexName){
     }
 
     /* Escribimos la cabecera: root = -1 y deleted = -1 */
-    fwrite(&u, sizeof(int), 1, f);
-    fwrite(&u, sizeof(int), 1, f);
+    if(fwrite(&u, sizeof(int), 1, f)!= 1){
+        fclose(f);
+        return false;
+    }
+
+    if(fwrite(&u, sizeof(int), 1, f) !=1){
+        fclose(f);
+        return false;
+    }
 
     fclose(f);
     return true;
