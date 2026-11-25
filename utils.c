@@ -21,8 +21,8 @@ void replaceExtensionByIdx(const char * fileName, char * indexName){
 
     if(lastDot > 0 && (i - (size_t)lastDot - 1) == 3){
         indexName[lastDot + 1] = 'i';
-        indexName[lastDot - 2] = 'd';
-        indexName[lastDot - 3] = 'x';
+        indexName[lastDot + 2] = 'd';
+        indexName[lastDot + 3] = 'x';
     }
 }
 
@@ -118,17 +118,56 @@ bool addIndexEntry(char * book_id, int bookOffset, const char * indexName){
 
 void printTree(size_t level, const char * indexName){
     FILE *f = NULL;
-    int root = -1;
+    int root = NO_DELETED_REGISTERS;
 
-    f = fopen(indexName, "rb");
-
-    if(f == NULL){
+    if(indexName == NULL){
         return;
     }
 
-    
+    f = fopen(indexName, "rb");
+    if ( f == NULL){
+        return;
+    }
+
+    if(fread(&root, sizeof(int), 1, f) == 1 && root != NO_DELETED_REGISTERS){
+        printTreeRec(f, root, 0, level, ' ');
+    }
 
     fclose(f);
+}
+
+void printTreeRec(FILE *f, int nodeId, size_t depth, size_t maxLevel, char branch){
+    Node n;
+    size_t i = 0;
+    long pos = 0;
+
+    if(nodeId < 0 || depth > maxLevel){
+        return;
+    }
+
+    pos = (long) INDEX_HEADER_SIZE + (long)nodeId * (long)sizeof(Node);
+    if(fseek(f, pos, SEEK_SET) != 0){
+        return;
+    }
+
+    if(fread(&n, sizeof(Node), 1, f) != 1){
+        return;
+    }
+
+    for(i=0; i<depth; i++){
+        printf("   ");
+    }
+
+    if(depth > 0){
+        printf("| %c ", branch);
+    }
+
+    printf("%.4s (%d): %d\n", n.book_id, nodeId, n.offset);
+
+    if (depth < maxLevel) {
+        printTreeRec(f, n.left, depth + 1, maxLevel, 'l');
+        printTreeRec(f, n.right, depth + 1, maxLevel, 'r');
+    }
 }
 
 
