@@ -29,20 +29,90 @@ static int showMenu(void){
 int main(void){
     char tableName[MAX_CMD] = "";
     char indexName[MAX_CMD] = "";
+    char titleBuf[MAX_TITLE];
+    char buf[MAX_CMD];
+    Book book;
     bool tableSelected = false;
     int choice = 0;
+    int level = 10;
 
     do{
         choice = showMenu;
         
         switch(choice){
             case 1: {
-
+                printf("Introduce el nombre de la tabla: ");
+                if(fgets(buf, sizeof(buf), stdin) != NULL){
+                    buf[strcspn(buf, "\n")] = '\0';
+                    if(strlen(buf) < 4){
+                        fprintf(stderr, "Error, nombre de fichero inválido \n");
+                        break;
+                    }
+                    if(createTable(buf)){
+                        strcpy(tableName, buf);
+                        replaceExtensionByIdx(tableName, indexName);
+                        tableSelected = true;
+                        printf("Tabla '%s' e indice '%s' listos.\n", tableName, indexName);
+                    }else{
+                        fprintf(stderr, "Error al abrir o crear la tabla '%s'.\n");
+                    }
+                }
+                break;
             }
             case 2: {
+                if(!tableSelected){
+                    fprintf(stderr, "Error, debes seleccionar una tabla primero con 'use");
+                    break;
+                }
+
+                printf("Introduce la clave primaria (4 caracteres): ");
+                if(fgets(buf, sizeof(buf), stdin) == NULL){
+                    break;
+                }
+                buf[strcspn(buf, "\n")] = '\0';
+                if(strlen(buf) != PK_SIZE){
+                    fprintf(stderr, "Error, la clave debe tener exactamente %d caracteres. \n", PK_SIZE);
+                    break;
+                }
+                
+                printf("Introduce el titulo del libro: ");
+                if(fgets(buf, sizeof(buf), stdin) == NULL){
+                    break;
+                }
+                buf[strcspn(buf, "\n")] = '\0';
+                if(strlen(buf) == 0){
+                    fprintf("Error, el titulo del libro no puede estar vaciodebe ser ");
+                    break;
+                }
+
+                memcpy(book.book_id, buf, PK_SIZE);
+                book.title_len = strlen(titleBuf);
+                book.title= titleBuf;
+
+                if(addTableEntry(&book, tableName, indexName)){
+                    printf("Libro '%s insertado correctamente. \n", book.book_id);
+                }else{
+                    fprintf(stderr, "Error al insertar el libro.\n");
+                }
+                break;
 
             }
             case 3: {
+                if(!tableSelected){
+                    fprintf(stderr, "Error, debes seleccionar una tabla primero con 'use");
+                    break;
+                }
+
+                printf("Introduce la profundidad maxima a imprimir: ");
+                if(fgets(buf, sizeof(buf), stdin) != NULL){
+                    level = atoi(buf);
+                    if(level <0){
+                        level = 0;
+                    }
+                }
+                printf("Arbol de Indices (%s) \n", indexName);
+                printTree((size_t)level, indexName);
+                break;
 
             }
             case 4: {
