@@ -5,6 +5,8 @@
 #ifndef CODE_V2_UTILS_H
 #define CODE_V2_UTILS_H
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 
 #define NO_DELETED_REGISTERS -1
@@ -30,7 +32,7 @@ typedef struct book {
 typedef struct node {
     char book_id[PK_SIZE];
     int left, right, parent, offset;
-}Node;
+} Node;
 
 
 /* Function prototypes.
