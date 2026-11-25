@@ -35,9 +35,10 @@ int main(void){
     bool tableSelected = false;
     int choice = 0;
     int level = 10;
+    int i;
 
     do{
-        choice = showMenu;
+        choice = showMenu();
         
         switch(choice){
             case 1: {
@@ -54,14 +55,14 @@ int main(void){
                         tableSelected = true;
                         printf("Tabla '%s' e indice '%s' listos.\n", tableName, indexName);
                     }else{
-                        fprintf(stderr, "Error al abrir o crear la tabla '%s'.\n");
+                        fprintf(stderr, "Error al abrir o crear la tabla '%s'.\n", buf);
                     }
                 }
                 break;
             }
             case 2: {
                 if(!tableSelected){
-                    fprintf(stderr, "Error, debes seleccionar una tabla primero con 'use");
+                    fprintf(stderr, "Error, debes seleccionar una tabla primero con 'use'.\n");
                     break;
                 }
 
@@ -76,12 +77,13 @@ int main(void){
                 }
                 
                 printf("Introduce el titulo del libro: ");
-                if(fgets(buf, sizeof(buf), stdin) == NULL){
+                if(fgets(titleBuf, sizeof(titleBuf), stdin) == NULL){
                     break;
                 }
-                buf[strcspn(buf, "\n")] = '\0';
-                if(strlen(buf) == 0){
-                    fprintf("Error, el titulo del libro no puede estar vaciodebe ser ");
+
+                titleBuf[strcspn(titleBuf, "\n")] = '\0';
+                if(strlen(titleBuf) == 0){
+                    fprintf(stderr, "Error, el titulo del libro no puede estar vacio. \n");
                     break;
                 }
 
@@ -90,7 +92,11 @@ int main(void){
                 book.title= titleBuf;
 
                 if(addTableEntry(&book, tableName, indexName)){
-                    printf("Libro '%s insertado correctamente. \n", book.book_id);
+                    printf("Libro '");
+                    for(i=0; i <PK_SIZE; i++){
+                        printf("%c", book.book_id[i]);
+                    }
+                    printf("' insertado correctamente. \n");
                 }else{
                     fprintf(stderr, "Error al insertar el libro.\n");
                 }
@@ -99,7 +105,7 @@ int main(void){
             }
             case 3: {
                 if(!tableSelected){
-                    fprintf(stderr, "Error, debes seleccionar una tabla primero con 'use");
+                    fprintf(stderr, "Error, debes seleccionar una tabla primero con 'use'.\n");
                     break;
                 }
 
